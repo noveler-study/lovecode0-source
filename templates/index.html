@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>연애 만난 코딩</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
+
+
+    <style>
+        * {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .item-img {
+            width: 500px;
+            height: 300px;
+
+            background-image: url("https://ifh.cc/g/lX9Ff5.jpg");
+            background-position: center;
+            background-size: cover;
+        }
+
+
+        .item-desc {
+            width: 500px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .item-dialog {
+            width: 500px;
+        }
+
+        .btn-dialog {
+            margin: auto;
+            width: 120px;
+
+            display: block;
+        }
+
+        .wrap {
+            width: 500px;
+            margin: auto;
+            padding-top: 100px;
+        }
+        .card-box {
+            width: 1000px;
+            margin: auto;
+            padding-top: 100px;
+            padding-bottom: 100px;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            listing();
+        });
+
+        function get_test() {
+            $.ajax({
+                type: "GET",
+                url: "http://openapi.seoul.go.kr:8088/6d4d776b466c656533356a4b4b5872/json/RealtimeCityAir/1/99",
+                data: {},
+                success: function (response) {
+                    console.log(response)
+                }
+            })
+        }
+
+        function post_test() {
+            let test = prompt("test 값을 넣어주세요");
+
+            $.ajax({
+                type: "POST",
+                url: "/test",
+                data: { test_give: test },
+                success: function (response) {
+                    alert(response['msg'])
+                }
+            })
+        }
+
+        function listing() {
+            $.ajax({
+                type: "GET",
+                url: "/dialog",
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+
+                        let dialogs = response['dialogs'];
+                        for (let i = 0; i < dialogs.length; i++) {
+                            let name = dialogs[i]['name'];
+                            let image = dialogs[i]['image'];
+                            let thema = dialogs[i]['thema'];
+                            let some = dialogs[i]['some'];
+
+                            if (some == false) {
+                                continue
+                            }
+
+                            let temp_html =
+                                    `<div class="card">
+                                        <img src="${image}" class="card-img-top" style="height: 400px" alt="...">
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="text-align: center">${name}</h5>
+                                            <ul className="list-group list-group-flush">
+                                                <li className="list-group-item">추천하는 대화주제 : ${thema}</li>
+                                            </ul>
+                                        </div>
+                                        <button type="button" onclick="remove()" class="btn btn-primary btn-dialog" style="margin-bottom: 30px">삭제하기</button>
+                                    </div>`
+
+
+                            $('#dialog-box').append(temp_html)
+                        }
+                    }
+                }
+            })
+        }
+
+        function remove() {
+            alert("아직 기능이 없습니다.")
+        }
+
+
+        function dialog() {
+            let name = $('#dialog-name').val();
+            let grade = $('#dialog-grade').val();
+            let image = $('#dialog-image').val();
+            let greeting = $('#dialog-greeting').val();
+            let thema = $('#dialog-thema').val();
+
+            if (grade == "1" || grade == "2") {
+                alert("문과왈 : 제 학번에 CC는 아무래도 힘들겠죠...")
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/dialog",
+                data: {name_give: name, image_give: image, grade_give: grade, greeting_give: greeting, thema_give: thema},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"]);
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="item-img"></div>
+    <button type="button" onclick="get_test()" class="btn btn-primary btn-dialog" style="margin-bottom: 30px">GET 테스트</button>
+    <button type="button" onclick="post_test()" class="btn btn-primary btn-dialog" style="margin-bottom: 30px">POST 테스트</button>
+    <div class="item-desc" style="text-align: center">
+        <h1>대화 입력기</h1>
+        <p>김문과의 대화를 도와주세요!</p>
+    </div>
+    <div class="item-dialog">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">이름</span>
+            </div>
+            <input id="dialog-name" type="text" placeholder="도와주시는 당신의 이름은?" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">학번</label>
+            </div>
+            <select class="custom-select" id="dialog-grade">
+                <option selected>-- 김문과의 학번은? --</option>
+                <option value="1">고대화석</option>
+                <option value="2">18</option>
+                <option value="3">19</option>
+                <option value="3">20</option>
+                <option value="3">21</option>
+                <option value="3">22</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">코디 이미지 URL</span>
+            </div>
+            <input id="dialog-image" type="text" class="form-control" placeholder="참고할 코디 사진의 이미지 주소를 입력해주세요" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text">첫인사</label>
+            </div>
+            <select class="custom-select" id="dialog-greeting">
+                <option selected>-- 첫인사는 어떻게 하면 좋을까요? --</option>
+                <option value="1">풀잎아 안녕! 나 누군지 아니?</option>
+                <option value="2">오늘 날씨 너무 좋다!</option>
+                <option value="3">너 점심 먹었어? 같이 먹을래?</option>
+                <option value="3">나는 김문과라고 해! 너는?</option>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">대화주제</span>
+            </div>
+            <input id="dialog-thema" type="text" class="form-control" placeholder="MBTI, 취미, 식사메뉴 등" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+        <button type="button" onclick="dialog()" class="btn btn-primary btn-dialog">대화 걸기</button>
+    </div>
+
+</div>
+    <div id="dialog-box" class="card-deck card-box">
+    </div>
+</body>
+
+</html>
