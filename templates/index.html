@@ -87,6 +87,9 @@
 
         function post_test() {
             let test = prompt("test 값을 넣어주세요");
+            if (test==null) {
+                return false
+            }
 
             $.ajax({
                 type: "POST",
